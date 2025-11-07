@@ -1,0 +1,23 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "plugins": ["html", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.html"],
+      "processor": "html"
+    }
+  ],
+  "rules": {
+    "prettier/prettier": "warn",
+    "no-unused-vars": "off",
+    "no-undef": "off"
+  }
+}

@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Maniac LLM Chain Processor</title>
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+    <style>
+        /*
+        * ----------------------
+        * CSS: Mobile-First & Visual Refinement
+        * ----------------------
+        */
+        :root {
+            --color-primary: #6366f1; /* indigo-500 */
+            --color-primary-600: #4f46e5;
+            --color-secondary: #0f172a; /* slate-900 */
+            --color-background: #0b1220; /* deep slate */
+            --color-surface: #0f172a; /* card base */
+            --color-card-bg: rgba(255,255,255,0.06);
+            --color-text: #e5e7eb; /* gray-200 */
+            --color-muted: #9ca3af;
+            --color-border: rgba(255,255,255,0.12);
+            --color-success: #22c55e;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --spacing-unit: 1rem;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+            --shadow-md: 0 10px 20px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.2);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.35);
+            --transition: all 240ms ease-in-out;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            color: var(--color-text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background:
+                radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.18), transparent 60%),
+                radial-gradient(900px 500px at 90% 0%, rgba(56,189,248,0.12), transparent 60%),
+                linear-gradient(180deg, #0b1220 0%, #0a0f1a 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: var(--spacing-unit);
+            box-sizing: border-box;
+        }
+
+        header {
+            width: 100%;
+            padding: calc(var(--spacing-unit) * 1.25);
+            color: var(--color-text);
+            text-align: center;
+            border-radius: var(--radius-xl);
+            backdrop-filter: blur(10px);
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));
+            border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-unit);
+            transform: translateY(0);
+            animation: fadeIn 500ms ease-out;
+        }
+
+        h1 {
+            margin: 0 0 6px 0;
+            font-size: 1.75rem;
+            letter-spacing: 0.3px;
+        }
+        header p { margin: 0; color: var(--color-muted); }
+
+        /* API Key Configuration Card */
+        #config-panel {
+            background: var(--color-card-bg);
+            padding: calc(var(--spacing-unit) * 1.25);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: calc(var(--spacing-unit) * 1.5);
+            border: 1px solid var(--color-border);
+            transition: var(--transition);
+        }
+
+        #config-panel input, #config-panel select {
+            width: 100%;
+            padding: 12px 14px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+            border: 1px solid var(--color-border);
+            background: rgba(255,255,255,0.06);
+            color: var(--color-text);
+            border-radius: var(--radius-lg);
+            box-sizing: border-box;
+            display: block;
+            outline: none;
+            transition: var(--transition);
+        }
+        #config-panel input:focus, #config-panel select:focus {
+            border-color: rgba(99,102,241,0.6);
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
+        }
+        
+        #config-panel button {
+            background: linear-gradient(180deg, var(--color-primary), var(--color-primary-600));
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        #config-panel button:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .stage-container {
+            margin-top: var(--spacing-unit);
+            background: var(--color-card-bg);
+            padding: calc(var(--spacing-unit) * 1.25);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            border-left: 5px solid var(--color-primary);
+            animation: fadeInUp 400ms ease-out;
+        }
+        
+        .stage-container h2 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 10px;
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: rgba(255,255,255,0.06);
+            color: var(--color-text);
+            box-sizing: border-box;
+            resize: vertical;
+            transition: var(--transition);
+        }
+        textarea:focus {
+            border-color: rgba(99,102,241,0.6);
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap; /* Mobile friendly wrapping */
+        }
+
+        .action-bar button, #add-stage-btn {
+            flex-grow: 1; /* Allows buttons to fill space */
+            padding: 10px 15px;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .send-btn {
+            background: linear-gradient(180deg, var(--color-primary), var(--color-primary-600));
+            color: white;
+        }
+
+        .send-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .copy-btn {
+            background-color: #1f2937;
+            color: #e5e7eb;
+        }
+
+        .copy-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        #add-stage-btn {
+            background-color: var(--color-success);
+            color: white;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 800px;
+            border-left: 5px solid rgba(255,255,255,0.2);
+        }
+        #add-stage-btn:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .response-area {
+            background: rgba(15,23,42,0.6);
+            padding: 15px;
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--color-border);
+            white-space: pre-wrap;
+            min-height: 50px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #e5e7eb;
+        }
+
+        .status-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            display: none; /* Controlled by JS */
+        }
+
+        .loading {
+            background-color: #f1c40f;
+            color: #111827;
+        }
+
+        .error {
+            background-color: var(--color-error);
+            color: white;
+        }
+
+        /* Utility Class for Stage Visibility */
+        .previous-output-toggle {
+            font-size: 0.8rem;
+            color: #555;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .previous-output-display {
+            border-left: 3px solid var(--color-primary);
+            padding-left: 10px;
+            margin: 10px 0;
+            font-style: italic;
+            background: rgba(255,255,255,0.04);
+            padding: 10px;
+            border-radius: var(--radius-lg);
+            display: none; /* Initially hidden */
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.8rem;
+        }
+        
+        /* Mobile-Specific Adjustments */
+        @media (max-width: 600px) {
+            .action-bar button {
+                width: 100%;
+                flex-grow: unset;
+                margin-bottom: 5px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-enter { animation: fadeIn 240ms ease-in-out; }
+
+        /* Install banner */
+        #install-banner {
+            position: fixed;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 720px;
+            display: none;
+            background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.06));
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 14px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            color: var(--color-text);
+            z-index: 50;
+        }
+        #install-banner .row { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+        #install-banner .actions { display:flex; gap: 8px; }
+        #install-banner button { padding: 10px 14px; border-radius: var(--radius-lg); border: none; font-weight:600; cursor:pointer; transition: var(--transition); box-shadow: var(--shadow-sm); }
+        #install-accept { background: linear-gradient(180deg, var(--color-primary), var(--color-primary-600)); color: #fff; }
+        #install-decline { background:#1f2937; color:#e5e7eb; }
+        #install-accept:hover, #install-decline:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Code Maniac LLM Chain Processor 🔗</h1>
+        <p>A multi-stage prompt orchestration tool using OpenRouter.</p>
+    </header>
+
+    <div class="container">
+        
+        <div id="config-panel">
+            <h2>🔑 Configuration</h2>
+            <p>Get your OpenRouter API Key and select a free model.</p>
+            <label for="api-key-input">OpenRouter API Key:</label>
+            <input type="password" id="api-key-input" placeholder="sk-or-v1-..." value="" required>
+            <div id="api-key-status" class="status-message error" style="display:none"></div>
+
+            <label for="model-select">Select Model (Free/Low Cost):</label>
+            <select id="model-select">
+                <option value="deepseek/deepseek-r1-0528">DeepSeek R1 0528 (Free)</option>
+                <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B Instruct (Free/Low)</option>
+                <option value="mistralai/mistral-nemo">Mistral Nemo (Low Cost)</option>
+                <option value="google/gemma-7b-it">Gemma 7B IT (Low Cost)</option>
+            </select>
+            <small>Note: Models marked "Free" can change. Please check <a href="https://openrouter.ai/models?q=free" target="_blank">OpenRouter Models</a> for the current list.</small>
+        </div>
+
+        <div id="stages-wrapper">
+            </div>
+
+        <button id="add-stage-btn">+ Add Next Stage (Chain Output)</button>
+        
+    </div>
+
+    <!-- Install Banner -->
+    <div id="install-banner" role="dialog" aria-live="polite" aria-label="Install App">
+        <div class="row">
+            <div>
+                <strong>Install as App</strong>
+                <div style="color:var(--color-muted); font-size:0.9rem;">Get a faster, fullscreen experience.</div>
+            </div>
+            <div class="actions">
+                <button id="install-decline">Not now</button>
+                <button id="install-accept">Install</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /*
+        * ----------------------
+        * JAVASCRIPT: Core Logic
+        * ----------------------
+        */
+
+        // State Management
+        const state = {
+            apiKey: '',
+            model: 'deepseek/deepseek-r1-0528',
+            stageCount: 0,
+            // Stores the history for each stage to ensure chain context
+            messageHistory: [],
+            isProcessing: false,
+            controllers: {}, // AbortController per stage for streaming
+        };
+
+        // Basic validation for OpenRouter API keys
+        function validateApiKey(key) {
+            return typeof key === 'string' && key.startsWith('sk-or-v1-') && key.length > 20;
+        }
+
+        // --- Core Functions ---
+
+        /**
+         * Renders a new stage into the UI, complete with input, response, and actions.
+         * @param {number} stageIndex The 0-based index of the stage.
+         */
+        function renderNewStage(stageIndex) {
+            state.stageCount = stageIndex + 1;
+
+            const hasPrevious = stageIndex > 0 && state.messageHistory[stageIndex - 1]?.response;
+            const previousResponse = hasPrevious ? state.messageHistory[stageIndex - 1].response : '';
+
+            const stageHtml = `
+                <div class="stage-container" id="stage-${stageIndex}">
+                    <h2>
+                        Stage ${stageIndex + 1}
+                        <span
+                            class="previous-output-toggle"
+                            id="toggle-prev-${stageIndex}"
+                            style="${hasPrevious ? '' : 'display:none'}"
+                            onclick="togglePreviousOutput(${stageIndex})"
+                        >Show Previous Output</span>
+                    </h2>
+                    <div class="previous-output-display" id="prev-output-${stageIndex}">${previousResponse || ''}</div>
+
+                    <label for="prompt-input-${stageIndex}">Prompt</label>
+                    <textarea id="prompt-input-${stageIndex}" placeholder="Enter prompt for stage ${stageIndex + 1}"></textarea>
+                    <div class="action-bar">
+                        <button class="send-btn" id="send-btn-${stageIndex}" onclick="processStage(${stageIndex})">
+                            <span class="spinner" style="display:none">⏳</span>
+                            <span class="send-text">Send to LLM</span>
+                        </button>
+                        <button class="stop-btn" id="stop-btn-${stageIndex}" onclick="stopStage(${stageIndex})" style="display:none;background-color: var(--color-warning); color: #fff;">
+                            ✋ Stop
+                        </button>
+                        <button class="copy-btn" id="copy-btn-${stageIndex}" onclick="copyResponse(${stageIndex})" disabled>📋 Copy Response</button>
+                    </div>
+                    <div class="response-area" id="response-${stageIndex}">Awaiting response...</div>
+                    <div class="status-message" id="status-${stageIndex}" style="display:none"></div>
+                </div>
+            `;
+
+            document.getElementById('stages-wrapper').insertAdjacentHTML('beforeend', stageHtml);
+
+            // Initialize history for this new stage
+            if (!state.messageHistory[stageIndex]) {
+                state.messageHistory[stageIndex] = {
+                    prompt: '',
+                    response: '',
+                    fullHistory: [],
+                };
+            }
+
+            // Scroll to the new stage
+            const stageEl = document.getElementById(`stage-${stageIndex}`);
+            if (stageEl) stageEl.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /**
+         * Toggles the visibility of the previous stage's output.
+         */
+        function togglePreviousOutput(stageIndex) {
+            const display = document.getElementById(`prev-output-${stageIndex}`);
+            const toggle = document.getElementById(`toggle-prev-${stageIndex}`);
+            if (!display || !toggle) return;
+            if (display.style.display === 'block') {
+                display.style.display = 'none';
+                toggle.textContent = 'Show Previous Output';
+            } else {
+                display.style.display = 'block';
+                toggle.textContent = 'Hide Previous Output';
+            }
+        }
+
+        /**
+         * Handles the API call for a specific stage.
+         * @param {number} stageIndex The 0-based index of the stage to process.
+         */
+        async function processStage(stageIndex) {
+            if (state.isProcessing) return; // Prevent multiple simultaneous calls
+
+            const promptInput = document.getElementById(`prompt-input-${stageIndex}`);
+            const responseArea = document.getElementById(`response-${stageIndex}`);
+            const statusDiv = document.getElementById(`status-${stageIndex}`);
+            const sendButton = document.getElementById(`send-btn-${stageIndex}`);
+            const copyButton = document.getElementById(`copy-btn-${stageIndex}`);
+            const stopButton = document.getElementById(`stop-btn-${stageIndex}`);
+
+            if (!promptInput || !responseArea || !statusDiv || !sendButton || !copyButton) return;
+
+            const userPrompt = promptInput.value.trim();
+            if (!userPrompt) {
+                alert('Prompt cannot be empty!');
+                return;
+            }
+
+            if (!validateApiKey(state.apiKey)) {
+                alert('Invalid API key. Please check your OpenRouter API key.');
+                return;
+            }
+
+            // Lock all controls during processing
+            state.isProcessing = true;
+            document.querySelectorAll('.send-btn').forEach(btn => btn.disabled = true);
+            sendButton.querySelector('.send-text').textContent = 'Processing...';
+            sendButton.querySelector('.spinner').style.display = 'inline';
+            responseArea.textContent = 'Waiting for LLM...';
+            statusDiv.style.display = 'none';
+            copyButton.disabled = true;
+            if (stopButton) stopButton.style.display = 'inline-block';
+
+            // --- Construct Messages for the API Call ---
+            let systemMessageContent = "You are a helpful, creative, and precise assistant.";
+
+            // If it's stage 2 or later, inject the previous output into the system message.
+            if (stageIndex > 0) {
+                const previousResponse = state.messageHistory[stageIndex - 1]?.response;
+                if (previousResponse) {
+                    systemMessageContent = `You are a helpful, creative, and precise assistant. Use the previous stage output as context when responding. Previous output follows:\n\n${previousResponse}`;
+                }
+            }
+
+            const messages = [
+                { role: 'system', content: systemMessageContent },
+                { role: 'user', content: userPrompt }
+            ];
+
+            // Update the history object for this stage
+            state.messageHistory[stageIndex].prompt = userPrompt;
+            state.messageHistory[stageIndex].fullHistory = messages;
+
+            try {
+                const controller = new AbortController();
+                state.controllers[stageIndex] = controller;
+
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${state.apiKey}`,
+                        'Content-Type': 'application/json',
+                        // Attribution headers are good practice
+                        'HTTP-Referer': window.location.href.split('?')[0],
+                        'X-Title': 'Code Maniac LLM Chain Processor',
+                    },
+                    body: JSON.stringify({
+                        model: state.model,
+                        messages,
+                        temperature: 0.7,
+                        max_tokens: 4096,
+                        stream: true
+                    }),
+                    signal: controller.signal,
+                });
+
+                if (!response.ok) {
+                    // Context-specific error messages
+                    if (response.status === 401) {
+                        throw new Error('Invalid API key. Please check your OpenRouter API key.');
+                    } else if (response.status === 429) {
+                        throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+                    } else if (response.status === 402) {
+                        throw new Error('Insufficient credits. Please add credits to your OpenRouter account.');
+                    } else {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error ? errorData.error.message : `HTTP error! Status: ${response.status}`);
+                    }
+                }
+
+                // If server does not stream, fall back to JSON parse
+                const contentType = response.headers.get('content-type') || '';
+                if (!('body' in response) || !response.body || !contentType.includes('text/event-stream')) {
+                    const data = await response.json();
+                    const llmResponse = data.choices?.[0]?.message?.content?.trim?.() || '';
+                    responseArea.textContent = llmResponse || 'No response content received.';
+                    statusDiv.className = 'status-message';
+                    statusDiv.style.display = 'none';
+                    copyButton.disabled = !llmResponse;
+                    state.messageHistory[stageIndex].response = llmResponse;
+                    const nextPrev = document.getElementById(`prev-output-${stageIndex + 1}`);
+                    if (nextPrev) nextPrev.textContent = llmResponse;
+                } else {
+                    // Streaming parse (SSE)
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder('utf-8');
+                    let buffer = '';
+                    let acc = '';
+                    let doneReading = false;
+                    while (!doneReading) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        buffer += decoder.decode(value, { stream: true });
+                        const parts = buffer.split('\n\n');
+                        buffer = parts.pop() || '';
+                        for (const part of parts) {
+                            const lines = part.split('\n').map(l => l.trim()).filter(Boolean);
+                            for (const line of lines) {
+                                if (!line.startsWith('data:')) continue;
+                                const dataStr = line.slice(5).trim();
+                                if (dataStr === '[DONE]') { doneReading = true; break; }
+                                try {
+                                    const json = JSON.parse(dataStr);
+                                    const choice = json.choices?.[0];
+                                    const delta = choice?.delta?.content ?? choice?.message?.content ?? choice?.text ?? '';
+                                    if (delta) {
+                                        acc += delta;
+                                        responseArea.textContent = acc;
+                                    }
+                                } catch (e) {
+                                    // Ignore malformed chunks
+                                }
+                            }
+                            if (doneReading) break;
+                        }
+                    }
+                    // Finalize
+                    const llmResponse = acc.trim();
+                    statusDiv.className = 'status-message';
+                    statusDiv.style.display = 'none';
+                    copyButton.disabled = !llmResponse;
+                    state.messageHistory[stageIndex].response = llmResponse;
+                    const nextPrev2 = document.getElementById(`prev-output-${stageIndex + 1}`);
+                    if (nextPrev2) nextPrev2.textContent = llmResponse;
+                }
+
+            } catch (error) {
+                console.error('LLM API Error:', error);
+                if (error?.name === 'AbortError') {
+                    responseArea.textContent = 'Request cancelled.';
+                    statusDiv.className = 'status-message';
+                    statusDiv.textContent = 'The request was cancelled.';
+                    statusDiv.style.display = 'block';
+                } else {
+                    responseArea.textContent = 'An error occurred. Check the status message.';
+                    statusDiv.className = 'status-message error';
+                    statusDiv.textContent = error?.message || 'Unknown error';
+                    statusDiv.style.display = 'block';
+                }
+            } finally {
+                // Unlock controls
+                state.isProcessing = false;
+                document.querySelectorAll('.send-btn').forEach(btn => (btn.disabled = false));
+                sendButton.querySelector('.send-text').textContent = 'Send to LLM';
+                sendButton.querySelector('.spinner').style.display = 'none';
+                if (stopButton) stopButton.style.display = 'none';
+                // Clean controller
+                try { delete state.controllers[stageIndex]; } catch (e) { /* noop */ }
+            }
+        }
+
+        /**
+         * Abort streaming for a stage.
+         */
+        function stopStage(stageIndex) {
+            const controller = state.controllers?.[stageIndex];
+            if (controller) {
+                try { controller.abort(); } catch (e) { /* noop */ }
+                try { delete state.controllers[stageIndex]; } catch (e) { /* noop */ }
+            }
+        }
+
+        /**
+         * Copies the response of a stage to the clipboard.
+         * @param {number} stageIndex The 0-based index of the stage.
+         */
+        function copyResponse(stageIndex) {
+            const responseArea = document.getElementById(`response-${stageIndex}`);
+            const copyButton = document.getElementById(`copy-btn-${stageIndex}`);
+            if (!responseArea || !copyButton) return;
+            if (!responseArea.textContent || responseArea.textContent === 'Awaiting response...') return;
+
+            navigator.clipboard.writeText(responseArea.textContent)
+                .then(() => {
+                    copyButton.textContent = '✅ Copied!';
+                    setTimeout(() => (copyButton.textContent = '📋 Copy Response'), 2000);
+                })
+                .catch(err => {
+                    console.error('Copy failed:', err);
+                    alert('Failed to copy text. Please copy manually.');
+                });
+        }
+
+        // ----------------------
+        // PWA: Install & SW
+        // ----------------------
+        let deferredInstallPrompt = null;
+        function isStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+        function showInstallBanner() {
+            const banner = document.getElementById('install-banner');
+            if (banner) banner.style.display = 'block';
+        }
+        function hideInstallBanner() {
+            const banner = document.getElementById('install-banner');
+            if (banner) banner.style.display = 'none';
+        }
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            if (isStandalone()) return;
+            if (sessionStorage.getItem('pwa-installed') === '1') return;
+            if (sessionStorage.getItem('pwa-dismissed') === '1') return;
+            deferredInstallPrompt = e;
+            showInstallBanner();
+        });
+        window.addEventListener('appinstalled', () => {
+            sessionStorage.setItem('pwa-installed', '1');
+            hideInstallBanner();
+        });
+        document.getElementById('install-accept').addEventListener('click', async () => {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                sessionStorage.setItem('pwa-installed', '1');
+            } else {
+                sessionStorage.setItem('pwa-dismissed', '1');
+            }
+            deferredInstallPrompt = null;
+            hideInstallBanner();
+        });
+        document.getElementById('install-decline').addEventListener('click', () => {
+            sessionStorage.setItem('pwa-dismissed', '1');
+            hideInstallBanner();
+        });
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+
+        // --- Event Listeners and Initialization ---
+
+        // Config Panel Listeners
+        document.getElementById('api-key-input').addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            state.apiKey = val;
+            const status = document.getElementById('api-key-status');
+            if (!val) {
+                status.style.display = 'none';
+                status.textContent = '';
+            } else if (!validateApiKey(val)) {
+                status.className = 'status-message error';
+                status.textContent = 'API key format looks invalid. Expected to start with "sk-or-v1-".';
+                status.style.display = 'block';
+            } else {
+                status.className = 'status-message';
+                status.textContent = 'API key format looks valid.';
+                status.style.display = 'block';
+            }
+        });
+
+        document.getElementById('model-select').addEventListener('change', (e) => {
+            state.model = e.target.value;
+            console.log(`Model set to: ${state.model}`);
+        });
+
+        // Add Stage Button Listener
+        document.getElementById('add-stage-btn').addEventListener('click', () => {
+            renderNewStage(state.stageCount);
+        });
+
+        // Initial setup
+        window.onload = () => {
+            // Check for stored API key (simple persistence for testing)
+            const storedKey = localStorage.getItem('openrouter-api-key');
+            if (storedKey) {
+                document.getElementById('api-key-input').value = storedKey;
+                state.apiKey = storedKey;
+                // Show format status quickly (do not validate storage here)
+                const status = document.getElementById('api-key-status');
+                if (validateApiKey(storedKey)) {
+                    status.className = 'status-message';
+                    status.textContent = 'API key format looks valid.';
+                    status.style.display = 'block';
+                }
+            }
+            
+            document.getElementById('api-key-input').addEventListener('change', (e) => {
+                const val = e.target.value.trim();
+                if (validateApiKey(val)) {
+                    localStorage.setItem('openrouter-api-key', val);
+                } else {
+                    localStorage.removeItem('openrouter-api-key');
+                }
+            });
+
+            // Start with Stage 1
+            renderNewStage(0);
+        };
+
+    </script>
+</body>
+</html>

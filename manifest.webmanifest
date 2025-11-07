@@ -1,0 +1,34 @@
+{
+  "name": "Code Maniac LLM Chain Processor",
+  "short_name": "Chain LLM",
+  "description": "A multi-stage prompt orchestration tool using OpenRouter.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0f172a",
+  "categories": ["productivity", "tools"],
+  "icons": [
+    {
+      "src": "/assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Chain",
+      "short_name": "New",
+      "url": "/?new=1",
+      "icons": [{ "src": "/assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
